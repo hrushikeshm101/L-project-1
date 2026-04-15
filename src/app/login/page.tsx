@@ -73,39 +73,6 @@ export default function LoginPage() {
     }
   };
 
-  const handleDemoLogin = async () => {
-    setError('');
-    setLoading(true);
-    
-    try {
-      // Demo mode: Check credentials against a known Firestore demo user
-      // For demo purposes ONLY - never use in production
-      const demoEmail = 'demo@shop.com';
-      const demoPassword = 'demo123';
-      
-      if (email === demoEmail && password === demoPassword) {
-        // Verify demo user exists in Firestore (optional verification)
-        const demoUsersRef = doc(db, 'users', 'demo_user_uid'); // Replace with actual demo UID
-        const demoSnap = await getDoc(demoUsersRef);
-        
-        if (demoSnap.exists()) {
-          // Use Firebase Auth to sign in the demo account securely
-          await login(demoEmail, demoPassword);
-          router.push('/');
-          router.refresh();
-          return;
-        }
-      }
-      
-      setError('Demo credentials not found in database');
-    } catch (err) {
-      console.error('Demo login error:', err);
-      setError('Demo login failed. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
     <div className="min-h-[calc(80vh-4rem)] flex items-center justify-center  p-4">
       <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-8 border border-gray-100">
@@ -171,23 +138,6 @@ export default function LoginPage() {
           <div className="relative flex justify-center text-sm">
             <span className="px-2 bg-white text-gray-500">Or continue with</span>
           </div>
-        </div>
-
-        <div className="grid grid-cols-1 gap-3">
-          {/* <button
-            onClick={() => handleAuth('register')}
-            disabled={loading}
-            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 transition text-sm font-medium disabled:opacity-60"
-          >
-            Create Account
-          </button> */}
-          <button
-            onClick={handleDemoLogin}
-            disabled={loading}
-            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 transition text-sm font-medium disabled:opacity-60"
-          >
-            Demo Login
-          </button>
         </div>
 
         <p className="text-center text-sm text-gray-600 mt-6">
