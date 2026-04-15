@@ -133,17 +133,10 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <div className="relative my-6">
-          <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-gray-200" /></div>
-          <div className="relative flex justify-center text-sm">
-            <span className="px-2 bg-white text-gray-500">Or continue with</span>
-          </div>
-        </div>
-
         <p className="text-center text-sm text-gray-600 mt-6">
           Don't have an account?{' '}
           <Link href="/signup" className="text-blue-600 hover:text-blue-800 font-medium hover:underline transition">
-            Sign up free
+            Sign up 
           </Link>
         </p>
       </div>
