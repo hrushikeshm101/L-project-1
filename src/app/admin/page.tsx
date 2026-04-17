@@ -1,128 +1,170 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Product } from '@/types';
-import { fetchAuth } from '@/lib/fetcher';
 import { Pencil, Trash2 } from 'lucide-react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { apiClient } from '@/api/api';
+import { useForm } from 'react-hook-form';
+
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+
+type ProductFormData = {
+  title: string;
+  price: number | string;
+  description: string;
+  category: string;
+};
 
 export default function AdminProductsPage() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [formData, setFormData] = useState({ title: '', price: '', description: '', category: '' });
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [productToDelete, setProductToDelete] = useState<string | null>(null);
 
-  const fetchProducts = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch('/api/products');
-      if (res.ok) setProducts(await res.json());
-    } catch (err) {
-      console.error('Failed to fetch products:', err);
-    } finally {
-      setLoading(false);
+  const { register, handleSubmit, reset, setValue } = useForm<ProductFormData>();
+
+  const { data: products = [], isLoading } = useQuery({
+    queryKey: ['products'],
+    queryFn: async () => {
+      const res = await apiClient.get<Product[]>('/products');
+      return res.data;
     }
-  };
+  });
 
-  useEffect(() => { fetchProducts(); }, []);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const payload = { ...formData, price: parseFloat(formData.price) };
-
-    let res;
-    if (editingId) {
-      res = await fetchAuth(`/api/products/${editingId}`, { method: 'PUT', body: JSON.stringify(payload) });
-    } else {
-      res = await fetchAuth('/api/products', { method: 'POST', body: JSON.stringify(payload) });
-    }
-
-    if (res.ok) {
+  const saveMutation = useMutation({
+    mutationFn: async (payload: ProductFormData) => {
+      if (editingId) {
+        return apiClient.put(`/products/${editingId}`, payload);
+      }
+      return apiClient.post('/products', payload);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['products'] });
       setIsModalOpen(false);
       setEditingId(null);
-      setFormData({ title: '', price: '', description: '', category: '' });
-      fetchProducts();
-    } else {
-      alert('Failed to save product');
-    }
+      reset();
+    },
+    onError: () => alert('Failed to save product'),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => apiClient.delete(`/products/${id}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+      setProductToDelete(null);
+    },
+  });
+
+  const onSubmit = (data: ProductFormData) => {
+    saveMutation.mutate({ ...data, price: parseFloat(data.price.toString()) });
   };
 
   const handleEdit = (p: Product) => {
     setEditingId(p.id);
-    setFormData({ title: p.title, price: p.price.toString(), description: p.description, category: p.category });
+    setValue('title', p.title);
+    setValue('price', p.price);
+    setValue('description', p.description);
+    setValue('category', p.category);
     setIsModalOpen(true);
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Delete this product permanently?')) return;
-    const res = await fetchAuth(`/api/products/${id}`, { method: 'DELETE' });
-    if (res.ok) fetchProducts();
+  const handleDelete = (id: string) => {
+    setProductToDelete(id);
+  };
+
+  const confirmDelete = () => {
+    if (productToDelete) {
+      deleteMutation.mutate(productToDelete);
+    }
+  };
+
+  const handleOpenAddModal = () => {
+    setIsModalOpen(true);
+    setEditingId(null);
+    reset({ title: '', price: '', description: '', category: '' });
   };
 
   return (
-    <div>
+    <div className="w-2xl">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <h1 className="text-2xl font-bold">Manage Products</h1>
-        <button onClick={() => { setIsModalOpen(true); setEditingId(null); setFormData({ title: '', price: '', description: '', category: '' }); }}
-          className="bg-neutral-600 text-white px-2 py-1 rounded hover:bg-neutral-700 transition shadow">
+        <Button onClick={handleOpenAddModal}>
           Add Product
-        </button>
+        </Button>
       </div>
 
-      {loading ? <p className="text-gray-500">Loading products...</p> : (
+      {isLoading ? <p className="text-gray-500">Loading products...</p> : (
         <div className="bg-white rounded-lg shadow overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left">
-              <thead className="bg-gray-50 border-b border-gray-200">
-                <tr>
-                  <th className="p-4 font-medium text-gray-600">Title</th>
-                  <th className="p-4 font-medium text-gray-600">Category</th>
-                  <th className="p-4 font-medium text-gray-600">Price</th>
-                  <th className="p-4 font-medium text-gray-600">Added</th>
-                  <th className="p-4 font-medium text-gray-600">Actions</th>
-                </tr>
-              </thead>
-              <tbody className='p-3'>
-                {products.length === 0 ? (
-                  <tr><td colSpan={4} className="p-6 text-center text-gray-500">No products found</td></tr>
-                ) : products.map(p => (
-                  <tr key={p.id} className="border-b border-gray-200 hover:bg-gray-200/50  ">
-                    <td className="p-4 font-medium">{p.title}</td>
-                    <td className="p-4 text-gray-600">{p.category}</td>
-                    <td className="p-4">${p.price.toFixed(2)}</td>
-                    <td className="p-4 text-sm text-gray-500">
-                      {p.createdAt ? new Date(p.createdAt).toLocaleDateString() : 'N/A'}
-                    </td>
-                    <td className="p-4  space-x-3 flex ">
-                      <button onClick={() => handleEdit(p)} className="text-neutral-600 hover:text-neutral-800 font-medium px-2.5 py-1 rounded-lg bg-neutral-200"><Pencil className='h-5 w-5' /></button>
-                      <button onClick={() => handleDelete(p.id)} className="text-red-800 hover:text-red-600 font-medium px-2.5 py-1 rounded-lg bg-neutral-200"><Trash2 className='w-5 h-6'/></button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <Table>
+            <TableHeader>
+              <TableRow className='p-4'>
+                <TableHead>Title</TableHead>
+                <TableHead>Category</TableHead>
+                <TableHead>Price</TableHead>
+                <TableHead>Added</TableHead>
+                <TableHead>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {products.length === 0 ? (
+                <TableRow><TableCell colSpan={5} className="text-center text-gray-500 py-6">No products found</TableCell></TableRow>
+              ) : products.map((p: Product) => (
+                <TableRow key={p.id}>
+                  <TableCell className="font-medium">{p.title}</TableCell>
+                  <TableCell className="text-gray-600"><Badge className='bg-gray-600'>{p.category}</Badge></TableCell>
+                  <TableCell>${p.price.toFixed(2)}</TableCell>
+                  <TableCell className="text-gray-500">
+                    {p.createdAt ? new Date(p.createdAt).toLocaleDateString() : 'N/A'}
+                  </TableCell>
+                  <TableCell className="space-x-3 flex">
+                    <Button variant="outline" size="icon" onClick={() => handleEdit(p)}><Pencil className="h-4 w-4" /></Button>
+                    <Button variant="destructive" size="icon" onClick={() => handleDelete(p.id)}><Trash2 className="h-4 w-4" /></Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </div>
       )}
 
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-xl">
-            <h2 className="text-xl font-bold mb-4">{editingId ? 'Edit Product' : 'Add New Product'}</h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <input required placeholder="Product Title" className="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-neutral-500 outline-none" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} />
-              <div className="grid grid-cols-2 gap-4">
-                <input required type="number" step="0.01" placeholder="Price" className="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-neutral-500 outline-none" value={formData.price} onChange={e => setFormData({...formData, price: e.target.value})} />
-                <input required placeholder="Category" className="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-neutral-500 outline-none" value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})} />
-              </div>
-              <textarea required placeholder="Description" rows={3} className="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-neutral-500 outline-none" value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} />
-              <div className="flex justify-end gap-3 pt-2">
-                <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50">Cancel</button>
-                <button type="submit" className="px-4 py-1.5 bg-neutral-600 text-white rounded hover:bg-neutral-700 transition">Save Product</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{editingId ? 'Edit Product' : 'Add New Product'}</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <Input required placeholder="Product Title" {...register('title', { required: true })} />
+            <div className="grid grid-cols-2 gap-4">
+              <Input required type="number" step="0.50" placeholder="Price" min="0" {...register('price', { required: true, min: 0, valueAsNumber: true })} />
+              <Input required placeholder="Category" {...register('category', { required: true })} />
+            </div>
+            <textarea required placeholder="Description" rows={3} className="flex min-h-[80px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" {...register('description', { required: true })} />
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>Cancel</Button>
+              <Button type="submit" disabled={saveMutation.isPending}>{saveMutation.isPending ? 'Saving...' : 'Save Product'}</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!productToDelete} onOpenChange={(open) => !open && setProductToDelete(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm Deletion</DialogTitle>
+          </DialogHeader>
+          <p className="py-4 text-gray-600">Are you sure you want to delete this product? This action cannot be undone.</p>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setProductToDelete(null)} disabled={deleteMutation.isPending}>Cancel</Button>
+            <Button variant="destructive" onClick={confirmDelete} disabled={deleteMutation.isPending}>
+              {deleteMutation.isPending ? 'Deleting...' : 'Delete'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

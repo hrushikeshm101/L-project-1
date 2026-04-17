@@ -3,6 +3,8 @@ import { useAuth } from '@/components/providers/AuthProvider';
 import { useCart } from '@/components/providers/CartProvider';
 import { useRouter } from 'next/navigation';
 import { fetchAuth } from '@/lib/fetcher';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 
 export default function CheckoutPage() {
   const { user, loading: authLoading } = useAuth();
@@ -26,20 +28,28 @@ export default function CheckoutPage() {
   };
 
   return (
-    <div className="max-w-md mx-auto mt-10 bg-white p-6 rounded shadow">
-      <h2 className="text-2xl font-bold mb-4">Checkout</h2>
-      {items.map(i => (
-        <div key={i.productId} className="flex justify-between py-2 border-b border-gray-200">
-          <span>{i.title} x{i.quantity}</span>
-          <span>${(i.price * i.quantity).toFixed(2)}</span>
-        </div>
-      ))}
-      <div className="flex justify-between font-bold mt-4 text-xl">
-        <span>Total</span><span>${total.toFixed(2)}</span>
-      </div>
-      <button onClick={handleCheckout} className="w-full bg-green-600 text-white py-3 rounded mt-6 hover:bg-green-700">
-        Place Order
-      </button>
+    <div className="max-w-md mx-auto mt-10">
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-2xl font-bold">Checkout</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {items.map(i => (
+            <div key={i.productId} className="flex justify-between py-2 last:border-0 mb-2">
+              <span>{i.title} <span className="text-muted-foreground">x{i.quantity}</span></span>
+              <span>${(i.price * i.quantity).toFixed(2)}</span>
+            </div>
+          ))}
+          <div className="flex justify-between font-bold mt-6 text-xl border-t pt-4">
+            <span>Total</span><span>${total.toFixed(2)}</span>
+          </div>
+        </CardContent>
+        <CardFooter>
+          <Button onClick={handleCheckout} className="w-full bg-green-600 hover:bg-green-700 text-lg font-bold h-12">
+            Place Order
+          </Button>
+        </CardFooter>
+      </Card>
     </div>
   );
 }

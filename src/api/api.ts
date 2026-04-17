@@ -1,14 +1,20 @@
+import axios from 'axios';
+import { auth } from '@/lib/firebase/client';
 
+export const apiClient = axios.create({
+  baseURL: '/api',
+});
 
-const API_METHODS = {
-    GET: "get",
-    POST: "post",
-    PUT: "put",
-    DELETE: "delete"
-}
-interface IApiParams {
-    method: keyof typeof API_METHODS,
-    endpoint: string,
-    data?: object | string,
-    headers?: Record<string, string>
-}
+apiClient.interceptors.request.use(
+  async (config) => {
+    const user = auth.currentUser;
+    if (user) {
+      const token = await user.getIdToken();
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);

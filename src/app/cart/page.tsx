@@ -6,6 +6,8 @@ import Link from 'next/link';
 import { useCart } from '@/components/providers/CartProvider';
 import { useAuth } from '@/components/providers/AuthProvider';
 import { CartItem } from '@/types';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 
 export default function CartPage() {
   const { items, syncCart, loading: cartLoading } = useCart();
@@ -25,12 +27,18 @@ export default function CartPage() {
   // Empty cart state
   if (items.length === 0) {
     return (
-      <div className="text-center mt-16 bg-white p-12 rounded-xl shadow-sm max-w-2xl mx-auto">
-        <h2 className="text-2xl font-bold mb-2 text-gray-900">Your cart is empty</h2>
-        <p className="text-gray-500 mb-6">Looks like you haven't added anything yet.</p>
-        <Link href="/" className="inline-block bg-neutral-600 text-white px-6 py-2.5 rounded-lg hover:bg-neutral-800 transition font-medium">
-          Continue Shopping
-        </Link>
+      <div className="flex justify-center mt-16 px-4">
+        <Card className="w-full max-w-2xl text-center border-none shadow-sm py-6">
+          <CardHeader>
+            <CardTitle className="text-2xl font-bold">Your cart is empty</CardTitle>
+            <p className="text-muted-foreground mt-2">Looks like you haven't added anything yet.</p>
+          </CardHeader>
+          <CardContent>
+            <Link href="/" className="inline-block mt-4">
+              <Button size="lg">Continue Shopping</Button>
+            </Link>
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -61,14 +69,14 @@ export default function CartPage() {
         {/* Cart Items List */}
         <div className="lg:col-span-2 space-y-4">
           {items.map((item) => (
-            <div key={item.productId} className="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 transition hover:shadow-md">
-              <div className="flex-1">
-                <h3 className="font-semibold text-lg text-gray-900">{item.title}</h3>
-                <p className="text-gray-500 mt-1">${item.price.toFixed(2)} per item</p>
-              </div>
+            <Card key={item.productId} className="flex flex-col sm:flex-row items-start sm:items-center justify-between transition hover:shadow-md shadow-sm border-gray-100">
+              <CardContent className="flex-1 p-4 sm:p-6 pb-2 sm:pb-6 shrink-0 min-w-[50%]">
+                <h3 className="font-semibold text-lg text-gray-900 line-clamp-1">{item.title}</h3>
+                <p className="text-muted-foreground mt-1">${item.price.toFixed(2)} per item</p>
+              </CardContent>
 
-              <div className="flex items-center gap-4">
-                <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
+              <div className="flex items-center gap-4 p-4 sm:p-6 pt-2 sm:pl-0 w-full sm:w-auto sm:justify-end">
+                <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden shrink-0">
                   <button
                     onClick={() => handleQuantityChange(item.productId, -1)}
                     disabled={syncing === item.productId || item.quantity <= 1}
@@ -90,43 +98,49 @@ export default function CartPage() {
                   </button>
                 </div>
 
-                <button
+                <Button
+                  variant="ghost"
                   onClick={() => handleRemove(item.productId)}
                   disabled={syncing === item.productId}
-                  className="text-red-500 hover:text-red-700 font-medium text-sm disabled:opacity-50 transition"
+                  className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                  size="sm"
                 >
                   Remove
-                </button>
+                </Button>
               </div>
-            </div>
+            </Card>
           ))}
         </div>
 
         {/* Order Summary */}
         <div className="lg:col-span-1">
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 sticky top-24">
-            <h2 className="text-xl font-bold mb-4 text-gray-900">Order Summary</h2>
-            <div className="space-y-3 text-gray-700">
-              <div className="border-t pt-3 flex justify-between font-bold text-xl text-gray-900">
-                <span>Total</span>
-                <span>${total.toFixed(2)}</span>
+          <Card className="sticky top-24 shadow-sm border border-gray-100">
+            <CardHeader>
+              <CardTitle className="text-xl font-bold">Order Summary</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <div className="border-t pt-3 flex justify-between font-bold text-xl">
+                  <span>Total</span>
+                  <span>${total.toFixed(2)}</span>
+                </div>
               </div>
-            </div>
+            </CardContent>
+            <CardFooter className="flex flex-col gap-4">
+              <Button
+                onClick={() => router.push('/checkout')}
+                disabled={!user || !!syncing}
+                className="w-full"
+                size="lg"
+              >
+                {user ? 'Proceed to Checkout' : 'Login to Checkout'}
+              </Button>
 
-            <button
-              onClick={() => router.push('/checkout')}
-              disabled={!user || !!syncing}
-              className="w-full mt-6 bg-neutral-600 text-white py-3 rounded-lg font-semibold hover:bg-neutral-700 disabled:opacity-50 disabled:cursor-not-allowed transition shadow-sm"
-            >
-              {user ? 'Proceed to Checkout' : 'Login to Checkout'}
-            </button>
-
-            <div className="mt-4 text-center">
-              <Link href="/" className="text-sm hover:bg-slate-600/40 px-4 py-2 rounded-lg underline">
+              <Link href="/" className="text-sm text-center hover:opacity-80 underline underline-offset-4">
                 Continue Shopping
               </Link>
-            </div>
-          </div>
+            </CardFooter>
+          </Card>
         </div>
       </div>
     </div>

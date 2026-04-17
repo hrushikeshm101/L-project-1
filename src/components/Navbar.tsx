@@ -7,12 +7,14 @@ import { useAuth } from '@/components/providers/AuthProvider';
 import { useCart } from '@/components/providers/CartProvider';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
+import AuthButton from './AuthButton';
+
 
 export default function Navbar() {
   const { user, logout, loading: authLoading } = useAuth();
   const { items } = useCart();
   const router = useRouter();
-  
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [roleLoading, setRoleLoading] = useState(true);
@@ -51,9 +53,9 @@ export default function Navbar() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link 
-            href="/" 
-            className="text-xl font-bold text-gray-900 hover:text-blue-600 transition flex items-center gap-2"
+          <Link
+            href="/"
+            className="text-xl font-bold text-gray-900 transition flex items-center gap-2"
           >
             <span>Zshop</span>
           </Link>
@@ -71,8 +73,8 @@ export default function Navbar() {
           {/* Desktop Right Side */}
           <div className="hidden md:flex items-center space-x-4">
             {/* Cart Icon */}
-            {user && <Link 
-              href="/cart" 
+            {user && <Link
+              href="/cart"
               className="relative p-2 text-gray-600 hover:text-neutral-600 transition px-3 py-1.5 hover:bg-neutral-200 rounded-lg"
               aria-label="Shopping Cart"
             >
@@ -91,19 +93,20 @@ export default function Navbar() {
               <div className="w-20 h-8 bg-gray-200 rounded animate-pulse" />
             ) : user ? (
               <div className="flex items-center gap-3">
-                <button 
+                <AuthButton initialUser={user} />
+                {/* <button
                   onClick={handleLogout}
                   className="text-sm px-3 py-1.5 text-red-600 hover:bg-red-50 rounded-md transition"
                 >
                   Logout
-                </button>
+                </button> */}
               </div>
             ) : (
               <div className="flex items-center gap-2">
                 <Link href="/login" className="text-sm px-3 py-1.5 border border-gray-300 rounded-md hover:bg-gray-50 transition">
                   Login
                 </Link>
-                <Link href="/signup" className="text-sm px-3 py-1.5 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
+                <Link href="/signup" className="text-sm px-3 py-1.5 bg-neutral-600 text-white rounded-md hover:bg-neutral-700 transition">
                   Sign Up
                 </Link>
               </div>
@@ -136,7 +139,7 @@ export default function Navbar() {
               Home
             </Link>
             {!roleLoading && isAdmin && (
-              <Link href="/admin/products" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-2 text-purple-600 hover:bg-purple-50 rounded font-medium">
+              <Link href="/admin/products" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-2 text-neutral-600 hover:bg-neutral-200 rounded font-medium">
                 Admin Panel
               </Link>
             )}
@@ -150,8 +153,8 @@ export default function Navbar() {
             ) : user ? (
               <div className="px-2 pt-2 border-t border-gray-100 flex flex-col gap-2">
                 {/* <span className="text-sm text-gray-600 px-2">Logged in as {user.email}</span> */}
-                <button 
-                  onClick={handleLogout} 
+                <button
+                  onClick={handleLogout}
                   className="text-left px-2 py-2 text-red-600 hover:bg-red-50 rounded"
                 >
                   Logout
