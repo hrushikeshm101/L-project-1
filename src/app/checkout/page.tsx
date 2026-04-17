@@ -1,6 +1,6 @@
 'use client';
-import { useAuth } from '@/components/AuthProvider';
-import { useCart } from '@/components/CartProvider';
+import { useAuth } from '@/components/providers/AuthProvider';
+import { useCart } from '@/components/providers/CartProvider';
 import { useRouter } from 'next/navigation';
 import { fetchAuth } from '@/lib/fetcher';
 

@@ -1,6 +1,6 @@
 'use client';
 import { createContext, useContext, useState, ReactNode } from 'react';
-import { CartItem } from '@/lib/types';
+import { CartItem } from '@/types';
 import { fetchAuth } from '@/lib/fetcher';
 import { useEffect } from 'react';
 

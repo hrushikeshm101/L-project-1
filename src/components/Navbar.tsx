@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/components/AuthProvider';
-import { useCart } from '@/components/CartProvider';
+import { useAuth } from '@/components/providers/AuthProvider';
+import { useCart } from '@/components/providers/CartProvider';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 

@@ -1,6 +1,6 @@
 'use client';
-import { useCart } from '@/components/CartProvider';
-import { Product, CartItem } from '@/lib/types';
+import { useCart } from '@/components/providers/CartProvider';
+import { Product, CartItem } from '@/types';
 
 export default function ProductCard({ product }: { product: Product }) {
   const { items, syncCart } = useCart();

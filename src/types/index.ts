@@ -15,7 +15,7 @@ export interface CartItem {
 }
 
 export interface Order {
-  id?: string;
+  id: string;
   userId: string;
   items: CartItem[];
   total: number;

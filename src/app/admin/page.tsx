@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { Product } from '@/lib/types';
+import { Product } from '@/types';
 import { fetchAuth } from '@/lib/fetcher';
 import { Pencil, Trash2 } from 'lucide-react';
 

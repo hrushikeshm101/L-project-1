@@ -35,20 +35,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const register = async (email: string, password: string) => {
     const { user: newUser } = await createUserWithEmailAndPassword(auth, email, password);
-    //  Create profile in Firestore (await to ensure it exists before redirect)
-    await setDoc(doc(db, 'users', newUser.uid), {
-      uid: newUser.uid,
-      email: newUser.email,
-      role: 'customer',
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp()
-    });
+    try {
+      //  Create profile in Firestore (await to ensure it exists before redirect)
+      await setDoc(doc(db, 'users', newUser.uid), {
+        uid: newUser.uid,
+        email: newUser.email,
+        role: 'customer',
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      });
+    } catch (err) {
+      console.error('Registration error:', err);
+    }
   };
 
   const login = async (email: string, password: string) => {
     const { user: loggedInUser } = await signInWithEmailAndPassword(auth, email, password);
     
-    // Fire-and-forget profile sync (doesn't block login redirect)
     try {
       const userRef = doc(db, 'users', loggedInUser.uid);
       const snap = await getDoc(userRef);

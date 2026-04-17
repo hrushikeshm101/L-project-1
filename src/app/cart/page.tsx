@@ -3,9 +3,9 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useCart } from '@/components/CartProvider';
-import { useAuth } from '@/components/AuthProvider';
-import { CartItem } from '@/lib/types';
+import { useCart } from '@/components/providers/CartProvider';
+import { useAuth } from '@/components/providers/AuthProvider';
+import { CartItem } from '@/types';
 
 export default function CartPage() {
   const { items, syncCart, loading: cartLoading } = useCart();
