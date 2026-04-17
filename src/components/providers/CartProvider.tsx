@@ -1,11 +1,11 @@
 'use client';
 import { createContext, useContext, useState, ReactNode } from 'react';
 import { CartItem } from '@/types';
-import { fetchAuth } from '@/lib/fetcher';
+import { apiClient } from '@/api/api';
 import { useEffect } from 'react';
 
 type Ctx = { items: CartItem[]; loading: boolean; syncCart: (items: CartItem[]) => Promise<void>; clearCart: () => Promise<void> };
-const CartContext = createContext<Ctx>({ items: [], loading: true, syncCart: async()=>{}, clearCart: async()=>{} });
+const CartContext = createContext<Ctx>({ items: [], loading: true, syncCart: async () => { }, clearCart: async () => { } });
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
@@ -14,11 +14,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
   // Sync from API on mount
   const fetchCart = async () => {
     try {
-      const res = await fetchAuth('/api/cart');
-      if (res.ok) {
-        const data = await res.json();
-        setItems(data.items || []);
-      }
+      const res = await apiClient.get('/cart');
+      setItems(res.data.items || []);
     } catch (err) {
       console.error('Failed to fetch cart:', err);
     } finally { setLoading(false); }
@@ -26,13 +23,21 @@ export function CartProvider({ children }: { children: ReactNode }) {
   useEffect(() => { fetchCart(); }, []);
 
   const syncCart = async (newItems: CartItem[]) => {
-    await fetchAuth('/api/cart', { method: 'POST', body: JSON.stringify({ items: newItems }) });
-    setItems(newItems);
+    try {
+      await apiClient.post('/cart', { items: newItems });
+      setItems(newItems);
+    } catch (err) {
+      console.error('Failed to sync cart:', err);
+    }
   };
 
   const clearCart = async () => {
-    await fetchAuth('/api/cart', { method: 'DELETE' });
-    setItems([]);
+    try {
+      await apiClient.delete('/cart');
+      setItems([]);
+    } catch (err) {
+      console.error('Failed to clear cart:', err);
+    }
   };
 
   return <CartContext.Provider value={{ items, loading, syncCart, clearCart }}>{children}</CartContext.Provider>;

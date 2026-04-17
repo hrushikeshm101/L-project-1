@@ -11,11 +11,11 @@ export default function SignupPage() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  
+
   const { register } = useAuth();
   const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
     setLoading(true);
@@ -34,7 +34,7 @@ export default function SignupPage() {
 
     try {
       await register(email, password);
-      // Optional: Redirect to onboarding, cart, or home
+      // Redirect to home
       router.push('/');
     } catch (err: any) {
       // Map Firebase error codes to user-friendly messages
@@ -93,7 +93,7 @@ export default function SignupPage() {
               className="w-full px-4 py-2.5 text-black border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition bg-white"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              
+
             />
           </div>
 
@@ -108,7 +108,7 @@ export default function SignupPage() {
               className="w-full px-4 py-2.5 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition bg-white"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              
+
             />
           </div>
 

@@ -2,7 +2,7 @@
 import { useAuth } from '@/components/providers/AuthProvider';
 import { useCart } from '@/components/providers/CartProvider';
 import { useRouter } from 'next/navigation';
-import { fetchAuth } from '@/lib/fetcher';
+import { apiClient } from '@/api/api';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 
@@ -17,12 +17,12 @@ export default function CheckoutPage() {
   const total = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
 
   const handleCheckout = async () => {
-    const res = await fetchAuth('/api/checkout', { method: 'POST' });
-    if (res.ok) {
+    try {
+      await apiClient.post('/checkout');
       await clearCart();
       alert('Order placed successfully!');
       router.push('/');
-    } else {
+    } catch (err) {
       alert('Checkout failed');
     }
   };

@@ -11,7 +11,7 @@ export default function ProductCard({ product }: { product: Product }) {
     const existing = items.find(i => i.productId === product.id);
     const newItems: CartItem[] = existing
       ? items.map(i => i.productId === product.id ? { ...i, quantity: i.quantity + 1 } : i)
-      : [...items, { productId: product.id, title: product.title, price: product.price, quantity: 1 }];
+      : [...items, { productId: product.id, title: product.title, price: product.price, quantity: 1, }];
     syncCart(newItems);
   };
 

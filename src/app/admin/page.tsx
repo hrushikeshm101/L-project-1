@@ -1,11 +1,11 @@
 'use client';
+
 import { useState } from 'react';
 import { Product } from '@/types';
 import { Pencil, Trash2 } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/api/api';
 import { useForm } from 'react-hook-form';
-
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
@@ -14,7 +14,7 @@ import { Badge } from '@/components/ui/badge';
 
 type ProductFormData = {
   title: string;
-  price: number | string;
+  price: number;
   description: string;
   category: string;
 };
@@ -85,7 +85,7 @@ export default function AdminProductsPage() {
   const handleOpenAddModal = () => {
     setIsModalOpen(true);
     setEditingId(null);
-    reset({ title: '', price: '', description: '', category: '' });
+    reset({ title: '', price: 0, description: '', category: '' });
   };
 
   return (
