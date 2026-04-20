@@ -67,10 +67,10 @@ export default function CartPage() {
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Cart Items List */}
-        <div className="lg:col-span-2 space-y-4">
+        <div className="lg:col-span-2 space-y-2">
           {items.map((item) => (
             <Card key={item.productId} className="flex flex-col sm:flex-row items-start sm:items-center justify-between transition hover:shadow-md shadow-sm border-gray-100">
-              <CardContent className="flex-1 p-4 sm:p-6 pb-2 sm:pb-6 shrink-0 min-w-[50%]">
+              <CardContent className="flex-1 p-4 sm:p-3 shrink-0 min-w-[50%]">
                 <h3 className="font-semibold text-lg text-gray-900 line-clamp-1">{item.title}</h3>
                 <p className="text-muted-foreground mt-1">${item.price.toFixed(2)} per item</p>
               </CardContent>
@@ -80,7 +80,7 @@ export default function CartPage() {
                   <button
                     onClick={() => handleQuantityChange(item.productId, -1)}
                     disabled={syncing === item.productId || item.quantity <= 1}
-                    className="px-3 py-1.5 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                    className="px-3 py-1.5 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition "
                     aria-label="Decrease quantity"
                   >
                     −

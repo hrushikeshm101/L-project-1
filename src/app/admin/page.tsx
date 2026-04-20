@@ -4,13 +4,14 @@ import { useState } from 'react';
 import { Product } from '@/types';
 import { Pencil, Trash2 } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiClient } from '@/api/api';
+import { api, apiClient } from '@/api/api';
 import { useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 type ProductFormData = {
   title: string;
@@ -38,9 +39,19 @@ export default function AdminProductsPage() {
   const saveMutation = useMutation({
     mutationFn: async (payload: ProductFormData) => {
       if (editingId) {
-        return apiClient.put(`/products/${editingId}`, payload);
+        // return apiClient.put(`/products/${editingId}`, payload);
+        return api({
+          endpoint: `/products/${editingId}`,
+          method: 'PUT',
+          data: payload
+        });
       }
-      return apiClient.post('/products', payload);
+      // return apiClient.post('/products', payload);
+      return api({
+        endpoint: '/products',
+        method: 'POST',
+        data: payload
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
@@ -52,7 +63,12 @@ export default function AdminProductsPage() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: async (id: string) => apiClient.delete(`/products/${id}`),
+    // mutationFn: async (id: string) => apiClient.delete(`/products/${id}`),
+    mutationFn: async (id: string) => api({
+      endpoint: `/products/${id}`,
+      method: 'DELETE',
+    }),
+    onError: () => alert('Failed to delete product'),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
       setProductToDelete(null);
@@ -90,7 +106,7 @@ export default function AdminProductsPage() {
 
   return (
     <div className="w-2xl">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 mt-6">
         <h1 className="text-2xl font-bold">Manage Products</h1>
         <Button onClick={handleOpenAddModal}>
           Add Product
@@ -98,7 +114,8 @@ export default function AdminProductsPage() {
       </div>
 
       {isLoading ? <p className="text-gray-500">Loading products...</p> : (
-        <div className="bg-white rounded-lg shadow overflow-hidden">
+        <div className="bg-white rounded-lg shadow overflow-hidden md:w-full w-[89vw]">
+          <ScrollArea className="rounded-md border h-auto w-full">
           <Table>
             <TableHeader>
               <TableRow className='p-4'>
@@ -128,6 +145,7 @@ export default function AdminProductsPage() {
               ))}
             </TableBody>
           </Table>
+              </ScrollArea>
         </div>
       )}
 

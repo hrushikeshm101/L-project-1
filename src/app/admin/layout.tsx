@@ -10,7 +10,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <div className="min-h-[calc(95vh-4rem)] bg-gray-100/80 w-full">
-      <main className="flex-1 p-6 md:px-45">{children}</main>
+      <main className="flex-1 p-2 md:px-45">{children}</main>
     </div>
   );
 }

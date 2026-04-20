@@ -2,7 +2,7 @@
 import { useAuth } from '@/components/providers/AuthProvider';
 import { useCart } from '@/components/providers/CartProvider';
 import { useRouter } from 'next/navigation';
-import { apiClient } from '@/api/api';
+import { apiClient, api } from '@/api/api';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 
@@ -18,7 +18,11 @@ export default function CheckoutPage() {
 
   const handleCheckout = async () => {
     try {
-      await apiClient.post('/checkout');
+      // await apiClient.post('/checkout');
+      await api({
+        method: 'POST',
+        endpoint: '/checkout',
+      })
       await clearCart();
       alert('Order placed successfully!');
       router.push('/');

@@ -139,7 +139,7 @@ export default function Navbar() {
               Home
             </Link>
             {!roleLoading && isAdmin && (
-              <Link href="/admin/products" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-2 text-neutral-600 hover:bg-neutral-200 rounded font-medium">
+              <Link href="/admin" onClick={() => setMobileMenuOpen(false)} className="block px-2 py-2 text-neutral-600 hover:bg-neutral-200 rounded font-medium">
                 Admin Panel
               </Link>
             )}

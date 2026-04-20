@@ -3,14 +3,18 @@
 import ProductCard from '@/components/ProductCard';
 import { Product } from '@/types';
 import { useQuery } from '@tanstack/react-query';
-import { apiClient } from '@/api/api';
+import { api, apiClient } from '@/api/api';
 
 export default function Home() {
   const { data: products = [], isLoading } = useQuery({
     queryKey: ['products'],
     queryFn: async () => {
-      const res = await apiClient.get<Product[]>('/products');
-      return res.data;
+      // const res = await apiClient.get<Product[]>('/products');
+      const res = await api({
+        endpoint: '/products',
+        method: 'GET',
+      })
+      return res?.data;
     }
   });
 
@@ -28,7 +32,7 @@ export default function Home() {
         <p className="text-center mt-10">No products available.</p>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 ">
-          {products.map(p => <ProductCard key={p.id} product={p} />)}
+          {products.map((p: Product) => <ProductCard key={p.id} product={p} />)}
         </div>
       )}
     </section>

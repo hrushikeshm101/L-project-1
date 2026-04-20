@@ -22,3 +22,9 @@ export interface Order {
   status: 'pending' | 'completed';
   createdAt: string;
 }
+
+export interface ApiRequest {
+  endpoint: string;
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE';
+  data?: string | object;
+}
