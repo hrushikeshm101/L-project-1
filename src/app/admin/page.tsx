@@ -31,22 +31,25 @@ export default function AdminProductsPage() {
   const { data: products = [], isLoading } = useQuery({
     queryKey: ['products'],
     queryFn: async () => {
-      const res = await apiClient.get<Product[]>('/products');
-      return res.data;
+      const res = await api({
+        endpoint: '/products',
+        method: 'GET',
+      });
+      return res?.data;
     }
   });
 
   const saveMutation = useMutation({
     mutationFn: async (payload: ProductFormData) => {
       if (editingId) {
-        // return apiClient.put(`/products/${editingId}`, payload);
+      
         return api({
           endpoint: `/products/${editingId}`,
           method: 'PUT',
           data: payload
         });
       }
-      // return apiClient.post('/products', payload);
+     
       return api({
         endpoint: '/products',
         method: 'POST',
@@ -63,7 +66,6 @@ export default function AdminProductsPage() {
   });
 
   const deleteMutation = useMutation({
-    // mutationFn: async (id: string) => apiClient.delete(`/products/${id}`),
     mutationFn: async (id: string) => api({
       endpoint: `/products/${id}`,
       method: 'DELETE',

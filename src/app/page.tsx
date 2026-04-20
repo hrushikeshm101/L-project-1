@@ -3,13 +3,12 @@
 import ProductCard from '@/components/ProductCard';
 import { Product } from '@/types';
 import { useQuery } from '@tanstack/react-query';
-import { api, apiClient } from '@/api/api';
+import { api } from '@/api/api';
 
 export default function Home() {
   const { data: products = [], isLoading } = useQuery({
     queryKey: ['products'],
     queryFn: async () => {
-      // const res = await apiClient.get<Product[]>('/products');
       const res = await api({
         endpoint: '/products',
         method: 'GET',

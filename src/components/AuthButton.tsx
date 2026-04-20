@@ -15,7 +15,6 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useAuth } from '@/components/providers/AuthProvider';
-import { LogOut } from 'lucide-react';
 import { User } from "firebase/auth";
 
 interface AuthButtonsProps {

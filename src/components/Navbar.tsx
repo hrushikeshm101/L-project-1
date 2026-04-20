@@ -94,12 +94,6 @@ export default function Navbar() {
             ) : user ? (
               <div className="flex items-center gap-3">
                 <AuthButton initialUser={user} />
-                {/* <button
-                  onClick={handleLogout}
-                  className="text-sm px-3 py-1.5 text-red-600 hover:bg-red-50 rounded-md transition"
-                >
-                  Logout
-                </button> */}
               </div>
             ) : (
               <div className="flex items-center gap-2">

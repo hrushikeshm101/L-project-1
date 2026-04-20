@@ -44,10 +44,9 @@ export const api = async ({
     const response = (error as AxiosError)?.response as any;
     if (response) {
       console.error('API Error:', response.status, response.data);
-      // throw Error(`API Error: ${response.status} - ${JSON.stringify(response.data)}`);
+``
     } else {
       console.error('Network or unexpected error:', error);
-      // throw Error('Network or unexpected error');
     }
   }
 }
